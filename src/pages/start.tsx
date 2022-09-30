@@ -12,6 +12,7 @@ const StartPage: NextPage = () => {
         createTraining
             .mutateAsync({ trainingName })
             .then((id) => router.push(`/training/${id}`))
+            .catch((err) => console.error(err))
     }
     return (
         <main className="flex h-screen w-screen flex-col items-center justify-center bg-background">
