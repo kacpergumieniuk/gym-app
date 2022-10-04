@@ -18,6 +18,11 @@ const AddExerciseModal = ({
     const [weightCount, setWeightCount] = useState(0)
     const [seriesCount, setSeriesCount] = useState(0)
     const [volume, setVolume] = useState(0)
+    const [exerciseName, setExerciseName] = useState('')
+
+    const handleCloseModal = () => {
+        setClose()
+    }
 
     useEffect(() => {
         setVolume(weightCount * seriesCount * repsCount)
@@ -25,7 +30,11 @@ const AddExerciseModal = ({
 
     return (
         <Transition appear show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={setClose}>
+            <Dialog
+                as="div"
+                className="relative z-10"
+                onClose={handleCloseModal}
+            >
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -74,6 +83,9 @@ const AddExerciseModal = ({
                                         placeholder="Exercise name"
                                         className="mb-3 w-full rounded-md border p-2 outline-none"
                                         id="exerciseName"
+                                        onChange={(e) =>
+                                            setExerciseName(e.target.value)
+                                        }
                                     />
                                     <label
                                         className="text-left text-sm"
