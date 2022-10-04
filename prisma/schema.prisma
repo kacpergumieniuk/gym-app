@@ -68,3 +68,13 @@ model Training {
      trainingName String
      startDate DateTime   @default(now())
 }
+
+model Exercise {
+    id            String    @id @default(cuid())
+    trainingId String
+    exerciseName String
+    weight Float
+    seriesCount Float
+    repsCount Float
+    volume Float
+}

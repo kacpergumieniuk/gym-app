@@ -1,6 +1,5 @@
 import { createRouter } from './context'
 import { z } from 'zod'
-import { Dialog } from '@headlessui/react'
 
 export const trainingRouter = createRouter()
     .mutation('createTraining', {
@@ -16,7 +15,7 @@ export const trainingRouter = createRouter()
     })
     .query('getCurrentTraining', {
         input: z.object({
-            trainingId: z.any(),
+            trainingId: z.string(),
         }),
         async resolve({ input, ctx }) {
             return await ctx.prisma.training.findUnique({
@@ -28,11 +27,38 @@ export const trainingRouter = createRouter()
     })
     .mutation('removeCurrentTraining', {
         input: z.object({
-            trainingId: z.any(),
+            trainingId: z.string(),
         }),
         async resolve({ input, ctx }) {
             await ctx.prisma.training.delete({
                 where: { id: input.trainingId },
+            })
+        },
+    })
+    .mutation('addTrainingExercise', {
+        input: z.object({
+            trainingId: z.string(),
+            exerciseName: z.string(),
+            weight: z.number(),
+            seriesCount: z.number(),
+            repsCount: z.number(),
+            volume: z.number(),
+        }),
+        async resolve({ input, ctx }) {
+           await ctx.prisma.exercise.create({
+                data: input
+            })
+        },
+    })
+    .query('getAllTrainings', {
+        input: z.object({
+            trainingId: z.string(),
+        }),
+        async resolve({ input, ctx }) {
+            return await ctx.prisma.exercise.findMany({
+                where: {
+                    trainingId: input.trainingId,
+                },
             })
         },
     })

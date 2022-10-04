@@ -2,17 +2,33 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { trpc } from '../../utils/trpc'
 import { IoMdClose } from 'react-icons/io'
-import { Dialog, Transition } from '@headlessui/react'
-import { useState, Fragment } from 'react'
+import { useState } from 'react'
 import AddExerciseModal from '../../components/AddExerciseModal'
+import { Exercise } from '@prisma/client'
+import CurrentTrainingExerciseTab from '../../components/currentTrainingExerciseTab'
 
 const CurrentTraining: NextPage = () => {
     const router = useRouter()
-    const { trainingId } = router.query
+    const trainingId = router.query.trainingId as string
+
     const currentTraining = trpc.useQuery([
         'training.getCurrentTraining',
         { trainingId },
     ])
+
+    const addExercise = trpc.useMutation('training.addTrainingExercise')
+    const exercises = trpc.useQuery([
+        'training.getAllTrainings',
+        { trainingId },
+    ])
+    const handleAddExercise = async (data: Exercise, volume: number) => {
+        await addExercise.mutateAsync({
+            ...data,
+            trainingId: trainingId,
+            volume: volume,
+        })
+        exercises.refetch()
+    }
 
     const [isAddExerciseModalOpen, setIsAddExerciseModalOpen] = useState(false)
 
@@ -35,6 +51,7 @@ const CurrentTraining: NextPage = () => {
             <AddExerciseModal
                 setClose={handleCloseAddExerciseModal}
                 isOpen={isAddExerciseModalOpen}
+                handleAddExercise={handleAddExercise}
             />
             <p className="absolute top-3 left-3 text-2xl font-bold text-primary">
                 Start time : {currentTraining.data?.startDate.getHours()}:
@@ -48,6 +65,12 @@ const CurrentTraining: NextPage = () => {
             <button onClick={handleOpenAddExerciseModal}>
                 Add new exercise
             </button>
+            <div className="mx-16 mt-20 flex flex-col gap-5">
+                {exercises &&
+                    exercises.data?.map((exercise) => (
+                        <CurrentTrainingExerciseTab exercise={exercise} />
+                    ))}
+            </div>
         </main>
     )
 }
